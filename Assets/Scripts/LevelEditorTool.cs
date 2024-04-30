@@ -1,7 +1,8 @@
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
-public class LevelFileReader : MonoBehaviour
+public class LevelEditorTool : MonoBehaviour
 {
     [SerializeField] private GameObject wallPrefab;
     [SerializeField] private GameObject boxPrefab;
@@ -10,11 +11,15 @@ public class LevelFileReader : MonoBehaviour
     [SerializeField] private GameObject playerPrefab;
 
     [SerializeField] private float tileSize = 1.0f;
-    [SerializeField] private string fileName = "level.txt";
+
+    [SerializeField] public int fileIndex;
+
+    int height;
+    int width;
 
     private GameObject[,] grid;
 
-    void Start()
+    void Awake()
     {
         LoadLevelFromFile();
     }
@@ -98,44 +103,64 @@ public class LevelFileReader : MonoBehaviour
             }
         } */
 
-        var filePath = File.ReadLines($"/Users/{Application.streamingAssetsPath}, {fileName}");
+        var filePath = File.ReadLines($"{Application.streamingAssetsPath}/{fileIndex}.txt").ToArray();
 
-        if (File.Exists(filePath))
+        height = filePath[1].Length;
+        width = filePath[0].Length;
+
+        grid = new GameObject[height, width];
+
+        for (int i = 0; i < filePath.Length; i++)
         {
-            string[] lines = File.ReadAllLines(filePath);
-            int numberOfRows = lines.Length;
-            int numberOfColumns = lines[0].Length;
-            grid = new GameObject[numberOfRows, numberOfColumns];
-
-            for (int i = 0; i < numberOfRows; i++)
+            string line = filePath[i];
+            for (int j = 0; j < line.Length; j++)
             {
-                for (int j = 0; j < numberOfColumns; j++)
-                {
-                    char tile = lines[i][j];
-                    Vector3 position = new Vector2(j * tileSize, i * tileSize);
+                //char tile = filePath[i][j];
+                char tile = line[j];
+                Vector2 position = new Vector2(i * tileSize, j * tileSize);
 
-                    switch (tile)
-                    {
-                        case '@':
-                            grid[i, j] = Instantiate(wallPrefab, position, Quaternion.identity);
-                            break;
-                        case ' ':
-                            grid[i, j] = Instantiate(floorPrefab, position, Quaternion.identity);
-                            break;
-                        case 'x':
-                            grid[i, j] = Instantiate(goalPrefab, position, Quaternion.identity);
-                            break;
-                        case 'o':
-                            grid[i, j] = Instantiate(boxPrefab, position, Quaternion.identity);
-                            break;
-                        case '<':
-                        case '>':
-                        case '^':
-                        case 'v':
-                            grid[i, j] = Instantiate(playerPrefab, position, Quaternion.identity);
-                            break;
-                    }
+                if (tile == '@')
+                {
+                    grid[i, j] = Instantiate(wallPrefab, position, Quaternion.identity);
                 }
+
+                if (tile == 'x')
+                {
+                    grid[i, j] = Instantiate(goalPrefab, position, Quaternion.identity);
+                }
+
+                if (tile == ' ')
+                {
+                    grid[i, j] = Instantiate(floorPrefab, position, Quaternion.identity);
+                }
+
+                if (tile == 'o')
+                {
+                    grid[i, j] = Instantiate(boxPrefab, position, Quaternion.identity);
+                }
+
+                /*switch (tile)
+                {
+                    case '@':
+                        grid[i,j] = Instantiate(wallPrefab, position, Quaternion.identity);
+                        break;
+                    case 'x':
+                        grid[i, j] = Instantiate(goalPrefab, position, Quaternion.identity);
+                        break;
+                    case 'o':
+                        grid[i, j] = Instantiate(boxPrefab, position, Quaternion.identity);
+                        break;
+                    case ' ':
+                        grid[i, j] = Instantiate(floorPrefab, position, Quaternion.identity);
+                        break;
+                    case '<':
+                    case '>':
+                    case '^':
+                    case 'v':
+                        grid[i, j] = Instantiate(playerPrefab, position, Quaternion.identity);
+                        break;
+                }*/
+
             }
         }
     }
@@ -150,6 +175,7 @@ public class LevelFileReader : MonoBehaviour
         for (int i = 0; i < rows; i++)
         {
             string row = "";
+
             for (int j = 0; j < cols; j++)
             {
                 if (grid[i, j] == null)
@@ -180,7 +206,7 @@ public class LevelFileReader : MonoBehaviour
             levelData[i] = row;
         }
 
-        string filePath = Path.Combine(Application.streamingAssetsPath, fileName);
+        var filePath = Path.Combine($"{Application.streamingAssetsPath}, {fileIndex}.txt");
         File.WriteAllLines(filePath, levelData);
     }
 }
