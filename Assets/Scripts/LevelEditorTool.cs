@@ -71,37 +71,8 @@ public class LevelEditorTool : MonoBehaviour
         }
     }
 
-    void LoadLevelFromFile()
+    public void LoadLevelFromFile()
     {
-        /*var lines = File.ReadLines($"/Users/{Application.streamingAssetsPath}/50").ToArray();
-
-        for (int j = 0; j < lines[i].Length; j++)
-        {
-            if (lines[i][j] == "@")
-            {
-                Instantiate(wallPrefab);
-            }
-
-            if (lines[i][j] == " ")
-            {
-                Instantiate(floorPrefab);
-            }
-
-            if (lines[i][j] == "x")
-            {
-                Instantiate(goalPrefab);
-            }
-
-            if (lines[i][j] == "o")
-            {
-                Instantiate(boxPrefab);
-            }
-
-            if (lines[i][j] == "<")
-            {
-                Instantiate(playerPrefab);
-            }
-        } */
 
         var filePath = File.ReadLines($"{Application.streamingAssetsPath}/{fileIndex}.txt").ToArray();
 
@@ -115,7 +86,6 @@ public class LevelEditorTool : MonoBehaviour
             string line = filePath[i];
             for (int j = 0; j < line.Length; j++)
             {
-                //char tile = filePath[i][j];
                 char tile = line[j];
                 Vector2 position = new Vector2(i * tileSize, j * tileSize);
 
@@ -139,28 +109,10 @@ public class LevelEditorTool : MonoBehaviour
                     grid[i, j] = Instantiate(boxPrefab, position, Quaternion.identity);
                 }
 
-                /*switch (tile)
+                if (tile == '<' || tile == '>' || tile == 'v' || tile == '^')
                 {
-                    case '@':
-                        grid[i,j] = Instantiate(wallPrefab, position, Quaternion.identity);
-                        break;
-                    case 'x':
-                        grid[i, j] = Instantiate(goalPrefab, position, Quaternion.identity);
-                        break;
-                    case 'o':
-                        grid[i, j] = Instantiate(boxPrefab, position, Quaternion.identity);
-                        break;
-                    case ' ':
-                        grid[i, j] = Instantiate(floorPrefab, position, Quaternion.identity);
-                        break;
-                    case '<':
-                    case '>':
-                    case '^':
-                    case 'v':
-                        grid[i, j] = Instantiate(playerPrefab, position, Quaternion.identity);
-                        break;
-                }*/
-
+                    grid[i, j] = Instantiate(playerPrefab, position, Quaternion.identity);
+                }
             }
         }
     }
